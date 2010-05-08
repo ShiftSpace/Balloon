@@ -1,4 +1,7 @@
 #example {
    width: 150px;
    height: 100px;
+   color: white;
+   font-family: helvetica, sans-serif;
+   padding: 4px;
 }

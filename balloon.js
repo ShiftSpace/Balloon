@@ -1,8 +1,9 @@
 var HalfPI = Math.PI/2;
 var ThreeFourths = HalfPI + Math.PI;
-var border = 4.0;
+var radius = 4.0;
+var blur = 8.0;
 
-var Balloon = new Class({
+window.Balloon = new Class({
   initialize: function(element) {
     var size = element.getSize();
     this.element = element;
@@ -17,12 +18,14 @@ var Balloon = new Class({
     });
     this.element.setStyles({
       position: "absolute",
-      zIndex: 1
+      zIndex: 1,
+      marginLeft: blur,
+      marginTop: blur
     });
     this.wrapper.grab(this.element.dispose());
     this.wrapper.setStyles({
-      width: size.x+(2*border),
-      height: size.y+(2*border)
+      width: size.x+(2*blur),
+      height: size.y+(2*blur)
     });
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
@@ -40,29 +43,48 @@ var Balloon = new Class({
     var ctxt = this.balloon.getContext("2d"),
         size = this.element.getSize();
 
-    this.balloon.set("width", size.x);
-    this.balloon.set("height", size.y);
+    this.balloon.set("width", size.x+(2*blur));
+    this.balloon.set("height", size.y+(2*blur));
     this.balloon.setStyles({
-      width: size.x,
-      height: size.y
+      width: size.x+(2*blur),
+      height: size.y+(2*blur)
     });
 
-    ctxt.fillStyle = "rgba(79, 170, 117, 1)";
-    ctxt.strokeStyle = "rgba(255, 255, 255, 1)";
-    ctxt.shadowColor = "rgba(79, 170, 117, 0.5)";
-    ctxt.shadowBlur = 4.0;
+    console.log(size);
 
-    ctxt.moveTo(border, border);
+    ctxt.strokeStyle = "rgba(255, 255, 255, 1)";
+    ctxt.lineWidth = 2.0;
+
+    ctxt.save();
+    ctxt.fillStyle = "rgba(79, 170, 117, 1)";
+    ctxt.shadowColor = "rgba(79, 170, 117, 0.95)";
+    ctxt.shadowBlur = blur;
+
     ctxt.beginPath();
-    ctxt.lineTo(size.x, 0);
-    ctxt.arc(size.x-border, size.x, size.x, HalfPI, 0, false);
-    ctxt.lineTo(size.x, size.y-border);
-    ctxt.arc(size.x-border, size.y-border, border, 0, -(ThreeFourths), false);
-    ctxt.lineTo(border, size.y);
-    ctxt.arc(border, size.y-border, border, -(ThreeFourths), -Math.PI, false);
-    ctxt.lineTo(0, border);
-    ctxt.arc(border, border, border, -Math.PI, -HalfPI, false);
-    ctxt.fill()
+    ctxt.lineTo(blur+radius, blur);
+    ctxt.lineTo(blur+size.x-radius, blur);
+    ctxt.lineTo(blur+size.x, blur+radius);
+    ctxt.lineTo(blur+size.x, blur+size.y-radius);
+    ctxt.lineTo(blur+size.x-radius, blur+size.y);
+    ctxt.lineTo(blur+radius, blur+size.y);
+    ctxt.lineTo(blur, blur+size.y-radius);
+    ctxt.lineTo(blur, blur+radius);
+    ctxt.closePath();
+    ctxt.fill();
+
+    ctxt.restore();
+    ctxt.moveTo(blur+radius, blur);
+    ctxt.beginPath();
+    ctxt.lineTo(blur+radius, blur);
+    ctxt.lineTo(blur+size.x-radius, blur);
+    ctxt.lineTo(blur+size.x, blur+radius);
+    ctxt.lineTo(blur+size.x, blur+size.y-radius);
+    ctxt.lineTo(blur+size.x-radius, blur+size.y);
+    ctxt.lineTo(blur+radius, blur+size.y);
+    ctxt.lineTo(blur, blur+size.y-radius);
+    ctxt.lineTo(blur, blur+radius);
+    ctxt.closePath();
+    ctxt.stroke();
   },
 
   show: function() {
