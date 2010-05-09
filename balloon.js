@@ -63,7 +63,7 @@ window.Balloon = new Class({
     offset: new Vector(0.0, 0.0),
     animate: true,
     pointer: null,            /* "top", "left", "right", "bottom" */
-    anchorTo: "top",          /* "top", "left", "right", "bottom" */
+    anchorTo: "left",          /* "top", "left", "right", "bottom" */
     anchor: null,
     openOnAnchorClick: true,
     visible: true
@@ -145,9 +145,7 @@ window.Balloon = new Class({
   },
 
   initAnchorBehavior: function() {
-    if(!this.pointer) {
-      this.pointer = this.invert[this.options.anchorTo];
-    }
+    this.pointer = this.invert[this.options.anchorTo];
     this.wrapper.setStyle("position", "absolute");
     var styles = {
       position: "absolute"
