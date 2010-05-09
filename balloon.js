@@ -73,11 +73,11 @@ window.Balloon = new Class({
     ctxt.lineTo(blur+size.x-radius, blur);
     ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
     ctxt.lineTo(blur+size.x, blur+size.y-radius);
-    ctxt.lineTo(blur+size.x-radius, blur+size.y);
+    ctxt.arc(blur+size.x-radius, blur+size.y-radius, radius, 0, HalfPI, false);
     ctxt.lineTo(blur+radius, blur+size.y);
-    ctxt.lineTo(blur, blur+size.y-radius);
+    ctxt.arc(blur+radius, blur+size.y-radius, radius, HalfPI, -Math.PI, false);
     ctxt.lineTo(blur, blur+radius);
-    ctxt.closePath();
+    ctxt.arc(blur+radius, blur+radius, radius, -Math.PI, -HalfPI, false);
     ctxt.fill();
 
 
