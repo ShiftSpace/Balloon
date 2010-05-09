@@ -18,7 +18,7 @@ window.Balloon = new Class({
     this.setOptions(options);
     this.setPointer(this.options.pointer);
     var size = element.getSize(),
-        pad = Math.max(blur, (this.pointer ? pointerSize : 0));
+        pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
     this.element = element;
     this.wrapper = new Element("div", {
       "class": "ss-balloon-wrapper"
@@ -55,7 +55,7 @@ window.Balloon = new Class({
   path: function() {
     var ctxt = this.balloon.getContext("2d"),
         size = this.element.getSize(),
-        pad = Math.max(blur, (this.pointer ? pointerSize : 0));
+        pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
 
     ctxt.moveTo(pad+radius, pad);
     ctxt.beginPath();
