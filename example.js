@@ -3,7 +3,7 @@ window.addEvent("domready", init);
 function init()
 {
   console.log("init");
-  new Balloon($("example1"));
+  var b1 = new Balloon($("example1"));
   new Balloon($("example2"), {
     pointer: "top"
   });
@@ -15,5 +15,8 @@ function init()
   });
   new Balloon($("example5"), {
     pointer: "left"
+  });
+  $("clickme").addEvent("click", function() {
+    b1.animate(".example-grow");
   });
 }

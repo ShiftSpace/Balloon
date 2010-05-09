@@ -4,6 +4,15 @@ var HalfPI = Math.PI/2,
     pointerSize = 10.0,
     borderWidth = 2.0;
 
+var SSFx = {};
+SSFx.Morph = Class.refactor(Fx.Morph, {
+  name: "SSFx.Morph",
+  step: function() {
+    this.previous();
+    this.fireEvent("step", this.subject);
+  }
+});
+
 window.Balloon = new Class({
   Implements: [Events, Options],
   
@@ -16,7 +25,7 @@ window.Balloon = new Class({
   },
 
   initialize: function(element, options) {
-    this.setOptions(options);
+    this.setOptions(this.defaults, options);
     this.setPointer(this.options.pointer);
     var size = element.getSize(),
         pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
@@ -43,6 +52,15 @@ window.Balloon = new Class({
     });
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
+    if(this.options.animate) {
+      this.anim = new SSFx.Morph(this.wrapper, {
+        duration: 500,
+        transition: Fx.Transitions.Elastic.easeOut,
+        events: {
+          step: this.refresh.bind(this)
+        }
+      });
+    }
     this.refresh();
   },
 
@@ -137,5 +155,9 @@ window.Balloon = new Class({
   setPointer: function(side)
   {
     this.pointer = side;
+  },
+
+  animate: function(style) {
+    if(this.options.animate) this.anim.start(style);
   }
 });

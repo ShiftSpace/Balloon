@@ -1,7 +1,12 @@
 .example {
-   width: 150px;
-   height: 100px;
-   color: white;
-   font-family: helvetica, sans-serif;
-   padding: 8px;
+    width: 150px;
+    height: 100px;
+    color: white;
+    font-family: helvetica, sans-serif;
+    padding: 8px;
+}
+
+.example-grow {
+    width: 300px;
+    height: 300px;
 }
