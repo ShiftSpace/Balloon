@@ -104,10 +104,14 @@ window.Balloon = new Class({
     document.body.grab(this.wrapper);
     if(this.options.animate) {
       this.showAnim = new SSFx.Morph(this.element, {
-        duration: 500,
+        duration: 750,
         transition: Fx.Transitions.Elastic.easeOut
       });
-      this.showAnim.addEvent("step", this.refresh.bind(this));
+      this.wrapperAnim = new SSFx.Morph(this.wrapper, {
+        duration: 750,
+        transition: Fx.Transitions.Elastic.easeOut
+      });
+      this.wrapperAnim.addEvent("step", this.refresh.bind(this));
       this.hideAnim = new Fx.Morph(this.element, {
         duration: 300,
         transition: Fx.Transitions.Cubic.easeOut
@@ -161,12 +165,12 @@ window.Balloon = new Class({
   show: function() {
     var asize = Vector.toVector(this.options.anchor.getSize()),
         apos = Vector.toVector(this.options.anchor.getPosition()),
-        size = new Vector(50, 50),
+        size = new Vector(20, 20),
         pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0)),
         rsize = size.add(new Vector(pad*2.0, pad*2.0));
         to = this.tos[this.options.anchorTo],
         av = apos.add(asize.div(2.0)),
-        bv = (asize[to+"comp"]()).add(size[to+"comp"]()).add(size.div(2.0)),
+        bv = (asize[to+"comp"]()).add(size[to+"comp"]()).add(rsize.div(2.0)),
         loc = av.sub(bv);
     this.element.setStyles({
       width: size.x,
@@ -183,14 +187,17 @@ window.Balloon = new Class({
       height: esize.y+(2.0*pad)
     });
     this.refresh();
-    /*
     var transStyles = {
       width: [20, this.size.x],
       height: [20, this.size.y]
     };
-    transStyles[this.growTos[this.pointer]] = [];
     this.showAnim.start(transStyles);
-    */
+    this.wrapperAnim.start({
+      left: [loc.x, loc.x-(this.size.x/2.0)],
+      top: [loc.y, loc.y-this.size.y]/*
+      width: [20, rsize.x],
+      height: [20, rsize.y]*/
+    });
   },
 
   hide: function() {
