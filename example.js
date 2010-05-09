@@ -16,7 +16,9 @@ function init()
   new Balloon($("example5"), {
     pointer: "left"
   });
-  $("clickme").addEvent("click", function() {
-    b1.animate(".example-grow");
+  var b6 = new Balloon($("example6"), {
+    pointer: "bottom",
+    visible: false,
+    anchor: $("clickme")
   });
 }

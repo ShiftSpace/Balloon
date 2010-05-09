@@ -19,19 +19,25 @@ window.Balloon = new Class({
   defaults: {
     autoPosition: false,
     position: null,
-    offset: null,
+    offset: {x: 0.0, y: 0.0},
     animate: true,
-    pointer: null /* "top", "left", "right", "bottom" */
+    pointer: null /* "top", "left", "right", "bottom" */,
+    anchor: null,
+    openOnAnchorClick: true,
+    visible: true
   },
 
   initialize: function(element, options) {
     this.setOptions(this.defaults, options);
-    this.setPointer(this.options.pointer);
+    this.pointer = this.options.pointer;
     var size = element.getSize(),
         pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
     this.element = element;
     this.wrapper = new Element("div", {
-      "class": "ss-balloon-wrapper"
+      "class": "ss-balloon-wrapper",
+      styles: {
+        display: this.options.visible ? "block" : "none"
+      }
     });
     this.balloon = new Element("canvas", {
       "styles": {
@@ -50,6 +56,7 @@ window.Balloon = new Class({
       width: size.x+(2*pad),
       height: size.y+(2*pad)
     });
+    this.size = size;
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
     if(this.options.animate) {
@@ -59,14 +66,41 @@ window.Balloon = new Class({
       });
       this.anim.addEvent("step", this.refresh.bind(this));
     }
+    if(this.options.anchor) this.initAnchorBehavior();
     this.refresh();
   },
 
-  set: function(property, value) {
-    if(property == "target") {
+  tos: {
+    "top": "y",
+    "right": "x",
+    "bottom": "y",
+    "left": "x"
+  },
+
+  initAnchorBehavior: function() {
+    if(!this.pointer) {
+      this.pointer = "bottom";
     }
-    this.element.set(property, value);
-    this.refresh();
+    this.wrapper.setStyle("position", "absolute");
+    var styles = {
+      position: "absolute"
+    };
+    styles[this.pointer] = this.options.offset[this.tos[this.pointer]];
+    this.wrapper.setStyles(styles);
+    if(this.options.openOnAnchorClick) {
+      this.options.anchor.addEvent("click", function(evt) {
+        evt = new Event(evt);
+        this.show();
+      }.bind(this));
+    }
+  },
+
+  show: function() {
+    this.element.setStyles({
+      display: "block",
+      width: 20,
+      height: 20
+    });
   },
 
   path: function() {
@@ -152,12 +186,14 @@ window.Balloon = new Class({
     this.fireEvent("hide", this);
   },
 
-  setPointer: function(side)
-  {
-    this.pointer = side;
+  animate: function(styleOrProperties) {
+    if(this.options.animate) this.anim.start(styleOrProperties);
   },
 
-  animate: function(style) {
-    if(this.options.animate) this.anim.start(style);
+  setSize: function(x, y) {
+    this.element.setStyles({
+      width: x,
+      height: x
+    });
   }
 });

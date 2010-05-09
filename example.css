@@ -10,3 +10,9 @@
     width: 300px;
     height: 300px;
 }
+
+#clickme {
+    position: absolute;
+    left: 400px;
+    top: 400px;
+}
