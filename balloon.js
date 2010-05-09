@@ -21,7 +21,8 @@ window.Balloon = new Class({
     position: null,
     offset: {x: 0.0, y: 0.0},
     animate: true,
-    pointer: null /* "top", "left", "right", "bottom" */,
+    pointer: null,            /* "top", "left", "right", "bottom" */
+    anchorTo: "top",          /* "top", "left", "right", "bottom" */
     anchor: null,
     openOnAnchorClick: true,
     visible: true
@@ -49,7 +50,8 @@ window.Balloon = new Class({
       position: "absolute",
       zIndex: 1,
       marginLeft: pad,
-      marginTop: pad
+      marginTop: pad,
+      overflow: "hidden"
     });
     this.wrapper.grab(this.element.dispose());
     this.wrapper.setStyles({
@@ -60,13 +62,19 @@ window.Balloon = new Class({
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
     if(this.options.animate) {
-      this.anim = new SSFx.Morph(this.element, {
+      this.showAnim = new SSFx.Morph(this.element, {
         duration: 500,
         transition: Fx.Transitions.Elastic.easeOut
       });
-      this.anim.addEvent("step", this.refresh.bind(this));
+      this.showAnim.addEvent("step", this.refresh.bind(this));
+      this.hideAnim = new Fx.Morph(this.element, {
+        duration: 300,
+        transition: Fx.Transitions.Cubic.easeOut
+      });
     }
-    if(this.options.anchor) this.initAnchorBehavior();
+    if(this.options.anchor) {
+      this.initAnchorBehavior();
+    }
     this.refresh();
   },
 
@@ -77,9 +85,24 @@ window.Balloon = new Class({
     "left": "x"
   },
 
+  compl: {
+    "top": "left",
+    "right": "top",
+    "bottom": "left",
+    "left": "top"
+  },
+
+  invert: {
+    "top": "bottom",
+    "right": "left",
+    "bottom": "top",
+    "left": "right"
+  },
+
   initAnchorBehavior: function() {
+    console.log("initAnchorBehavior");
     if(!this.pointer) {
-      this.pointer = "bottom";
+      this.pointer = this.invert[this.options.anchorTo];
     }
     this.wrapper.setStyle("position", "absolute");
     var styles = {
@@ -88,19 +111,56 @@ window.Balloon = new Class({
     styles[this.pointer] = this.options.offset[this.tos[this.pointer]];
     this.wrapper.setStyles(styles);
     if(this.options.openOnAnchorClick) {
+      console.log("add");
       this.options.anchor.addEvent("click", function(evt) {
         evt = new Event(evt);
+        console.log("click");
         this.show();
       }.bind(this));
     }
   },
 
   show: function() {
+    console.log("show");
+    var asize = this.options.anchor.getSize(),
+        apos = this.options.anchor.getPosition(),
+        pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
+    var styles = {
+      width: 50,
+      height: 50
+    };
+    var to = this.tos[this.options.anchorTo];
+    styles[this.invert[this.options.anchorTo]] = apos[to] - this.options.offset[to];
+    to = this.tos[this.compl[this.options.anchorTo]];
+    styles[this.compl[this.options.anchorTo]] = (apos[to]+(asize[to]/2.0)-10) - this.options.offset[to];
+    console.log(styles);
     this.element.setStyles({
-      display: "block",
-      width: 20,
-      height: 20
+      width: styles.width,
+      height: styles.height
     });
+    this.wrapper.setStyles({
+      position: "absolute",
+      display: "block",
+      top: styles.top || "",
+      right: styles.right || "",
+      bottom: styles.bottom || "",
+      left: styles.left || "",
+      width: styles.width+(2.0*pad),
+      height: styles.height+(2.0*pad)
+    });
+    this.refresh();
+    /*
+    var transStyles = {
+      width: [20, this.size.x],
+      height: [20, this.size.y]
+    };
+    transStyles[this.growTos[this.pointer]] = [];
+    this.showAnim.start(transStyles);
+    */
+  },
+
+  hide: function() {
+    this.hideAnim.start("opacity", 0.0);
   },
 
   path: function() {
@@ -178,16 +238,8 @@ window.Balloon = new Class({
     ctxt.stroke();
   },
 
-  show: function() {
-    this.fireEvent("show", this);
-  },
-
-  hide: function() {
-    this.fireEvent("hide", this);
-  },
-
   animate: function(styleOrProperties) {
-    if(this.options.animate) this.anim.start(styleOrProperties);
+    if(this.options.animate) this.showAnim.start(styleOrProperties);
   },
 
   setSize: function(x, y) {
