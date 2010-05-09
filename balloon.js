@@ -167,7 +167,7 @@ window.Balloon = new Class({
         apos = Vector.toVector(this.options.anchor.getPosition()),
         size = new Vector(20, 20),
         pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0)),
-        rsize = size.add(new Vector(pad*2.0, pad*2.0));
+        rsize = size.add(new Vector(pad*2.0, pad*2.0)),
         to = this.tos[this.options.anchorTo],
         av = apos.add(asize.div(2.0)),
         bv = (asize[to+"comp"]()).add(size[to+"comp"]()).add(rsize.div(2.0)),
@@ -194,9 +194,9 @@ window.Balloon = new Class({
     this.showAnim.start(transStyles);
     this.wrapperAnim.start({
       left: [loc.x, loc.x-(this.size.x/2.0)],
-      top: [loc.y, loc.y-this.size.y]/*
-      width: [20, rsize.x],
-      height: [20, rsize.y]*/
+      top: [loc.y, loc.y-this.size.y],
+      width: [20, this.size.x+(pad*2.0)],
+      height: [20, this.size.y+(pad*2.0)]
     });
   },
 
