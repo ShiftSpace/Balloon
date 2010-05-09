@@ -4,6 +4,15 @@ var radius = 4.0;
 var blur = 8.0;
 
 window.Balloon = new Class({
+  Implements: [Events, Options],
+  
+  defaults: {
+    autoPosition: false,
+    position: null,
+    offset: null,
+    animate: true
+  },
+
   initialize: function(element) {
     var size = element.getSize();
     this.element = element;
