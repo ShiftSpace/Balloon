@@ -10,10 +10,12 @@ window.Balloon = new Class({
     autoPosition: false,
     position: null,
     offset: null,
-    animate: true
+    animate: true,
+    pointer: null /* "top", "left", "right", "bottom" */
   },
 
-  initialize: function(element) {
+  initialize: function(element, options) {
+    this.setOptions(options);
     var size = element.getSize();
     this.element = element;
     this.wrapper = new Element("div", {
@@ -69,13 +71,17 @@ window.Balloon = new Class({
 
     ctxt.moveTo(blur+radius, blur);
     ctxt.beginPath();
+    /* top */
     ctxt.lineTo(blur+radius, blur);
     ctxt.lineTo(blur+size.x-radius, blur);
     ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
+    /* right */
     ctxt.lineTo(blur+size.x, blur+size.y-radius);
     ctxt.arc(blur+size.x-radius, blur+size.y-radius, radius, 0, HalfPI, false);
+    /* bottom */
     ctxt.lineTo(blur+radius, blur+size.y);
     ctxt.arc(blur+radius, blur+size.y-radius, radius, HalfPI, -Math.PI, false);
+    /* left */
     ctxt.lineTo(blur, blur+radius);
     ctxt.arc(blur+radius, blur+radius, radius, -Math.PI, -HalfPI, false);
     ctxt.fill();
@@ -83,13 +89,17 @@ window.Balloon = new Class({
     ctxt.restore();
     ctxt.moveTo(blur+radius, blur);
     ctxt.beginPath();
+    /* top */
     ctxt.lineTo(blur+radius, blur);
     ctxt.lineTo(blur+size.x-radius, blur);
     ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
+    /* right */
     ctxt.lineTo(blur+size.x, blur+size.y-radius);
     ctxt.arc(blur+size.x-radius, blur+size.y-radius, radius, 0, HalfPI, false);
+    /* bottom */
     ctxt.lineTo(blur+radius, blur+size.y);
     ctxt.arc(blur+radius, blur+size.y-radius, radius, HalfPI, -Math.PI, false);
+    /* left */
     ctxt.lineTo(blur, blur+radius);
     ctxt.arc(blur+radius, blur+radius, radius, -Math.PI, -HalfPI, false);
     ctxt.stroke();
@@ -101,5 +111,10 @@ window.Balloon = new Class({
 
   hide: function() {
     this.fireEvent("hide", this);
+  },
+
+  setPointer: function(side)
+  {
+    this.pointer = side;
   }
 });
