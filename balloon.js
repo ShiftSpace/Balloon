@@ -53,13 +53,11 @@ window.Balloon = new Class({
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
     if(this.options.animate) {
-      this.anim = new SSFx.Morph(this.wrapper, {
+      this.anim = new SSFx.Morph(this.element, {
         duration: 500,
-        transition: Fx.Transitions.Elastic.easeOut,
-        events: {
-          step: this.refresh.bind(this)
-        }
+        transition: Fx.Transitions.Elastic.easeOut
       });
+      this.anim.addEvent("step", this.refresh.bind(this));
     }
     this.refresh();
   },
@@ -128,6 +126,8 @@ window.Balloon = new Class({
       width: size.x+(2*pad),
       height: size.y+(2*pad)
     });
+
+    ctxt.clearRect(0, 0, size.x+(2*pad), size.y+(2*pad));
 
     ctxt.save();
     ctxt.fillStyle = "rgba(79, 170, 117, 1)";
