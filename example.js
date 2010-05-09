@@ -7,4 +7,13 @@ function init()
   new Balloon($("example2"), {
     pointer: "top"
   });
+  new Balloon($("example3"), {
+    pointer: "right"
+  });
+  new Balloon($("example4"), {
+    pointer: "bottom"
+  });
+  new Balloon($("example5"), {
+    pointer: "left"
+  });
 }
