@@ -59,8 +59,6 @@ window.Balloon = new Class({
       height: size.y+(2*blur)
     });
 
-    console.log(size);
-
     ctxt.strokeStyle = "rgba(255, 255, 255, 1)";
     ctxt.lineWidth = 2.0;
 
@@ -69,10 +67,11 @@ window.Balloon = new Class({
     ctxt.shadowColor = "rgba(79, 170, 117, 0.95)";
     ctxt.shadowBlur = blur;
 
+    ctxt.moveTo(blur+radius, blur);
     ctxt.beginPath();
     ctxt.lineTo(blur+radius, blur);
     ctxt.lineTo(blur+size.x-radius, blur);
-    ctxt.lineTo(blur+size.x, blur+radius);
+    ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
     ctxt.lineTo(blur+size.x, blur+size.y-radius);
     ctxt.lineTo(blur+size.x-radius, blur+size.y);
     ctxt.lineTo(blur+radius, blur+size.y);
@@ -81,7 +80,9 @@ window.Balloon = new Class({
     ctxt.closePath();
     ctxt.fill();
 
+
     ctxt.restore();
+    /*
     ctxt.moveTo(blur+radius, blur);
     ctxt.beginPath();
     ctxt.lineTo(blur+radius, blur);
@@ -94,6 +95,7 @@ window.Balloon = new Class({
     ctxt.lineTo(blur, blur+radius);
     ctxt.closePath();
     ctxt.stroke();
+    */
   },
 
   show: function() {
