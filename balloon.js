@@ -1,7 +1,7 @@
-var HalfPI = Math.PI/2;
-var ThreeFourths = HalfPI + Math.PI;
-var radius = 6.0;
-var blur = 8.0;
+var HalfPI = Math.PI/2,
+    radius = 6.0,
+    blur = 8.0,
+    pointerSize = 10.0;
 
 window.Balloon = new Class({
   Implements: [Events, Options],
@@ -16,7 +16,9 @@ window.Balloon = new Class({
 
   initialize: function(element, options) {
     this.setOptions(options);
-    var size = element.getSize();
+    this.setPointer(this.options.pointer);
+    var size = element.getSize(),
+        pad = Math.max(blur, (this.pointer ? pointerSize : 0));
     this.element = element;
     this.wrapper = new Element("div", {
       "class": "ss-balloon-wrapper"
@@ -30,13 +32,13 @@ window.Balloon = new Class({
     this.element.setStyles({
       position: "absolute",
       zIndex: 1,
-      marginLeft: blur,
-      marginTop: blur
+      marginLeft: pad,
+      marginTop: pad
     });
     this.wrapper.grab(this.element.dispose());
     this.wrapper.setStyles({
-      width: size.x+(2*blur),
-      height: size.y+(2*blur)
+      width: size.x+(2*pad),
+      height: size.y+(2*pad)
     });
     this.wrapper.grab(this.balloon);
     document.body.grab(this.wrapper);
@@ -50,15 +52,43 @@ window.Balloon = new Class({
     this.refresh();
   },
 
+  path: function() {
+    var ctxt = this.balloon.getContext("2d"),
+        size = this.element.getSize(),
+        pad = Math.max(blur, (this.pointer ? pointerSize : 0));
+
+    ctxt.moveTo(pad+radius, pad);
+    ctxt.beginPath();
+    /* top */
+    ctxt.lineTo(pad+radius, pad);
+    if(this.pointer == "top"){
+      ctxt.lineTo(pad+(size.x/2.0)-(pointerSize/2.0), pad);
+      ctxt.lineTo(pad+(size.x/2.0)+(pointerSize/2.0), pad-pointerSize);
+      ctxt.lineTo(pad+(size.x/2.0)+pointerSize, pad);
+    }
+    ctxt.lineTo(pad+size.x-radius, pad);      
+    ctxt.arc(pad+size.x-radius, pad+radius, radius, -HalfPI, 0, false);
+    /* right */
+    ctxt.lineTo(pad+size.x, pad+size.y-radius);
+    ctxt.arc(pad+size.x-radius, pad+size.y-radius, radius, 0, HalfPI, false);
+    /* bottom */
+    ctxt.lineTo(pad+radius, pad+size.y);
+    ctxt.arc(pad+radius, pad+size.y-radius, radius, HalfPI, -Math.PI, false);
+    /* left */
+    ctxt.lineTo(pad, pad+radius);
+    ctxt.arc(pad+radius, pad+radius, radius, -Math.PI, -HalfPI, false);
+  },
+
   refresh: function() {
     var ctxt = this.balloon.getContext("2d"),
-        size = this.element.getSize();
+        size = this.element.getSize(),
+        pad = Math.max(blur, (this.pointer ? pointerSize : 0));
 
-    this.balloon.set("width", size.x+(2*blur));
-    this.balloon.set("height", size.y+(2*blur));
+    this.balloon.set("width", size.x+(2*pad));
+    this.balloon.set("height", size.y+(2*pad));
     this.balloon.setStyles({
-      width: size.x+(2*blur),
-      height: size.y+(2*blur)
+      width: size.x+(2*pad),
+      height: size.y+(2*pad)
     });
 
     ctxt.strokeStyle = "rgba(255, 255, 255, 1)";
@@ -67,41 +97,13 @@ window.Balloon = new Class({
     ctxt.save();
     ctxt.fillStyle = "rgba(79, 170, 117, 1)";
     ctxt.shadowColor = "rgba(79, 170, 117, 0.95)";
-    ctxt.shadowBlur = blur;
+    ctxt.shadowBlur = pad;
 
-    ctxt.moveTo(blur+radius, blur);
-    ctxt.beginPath();
-    /* top */
-    ctxt.lineTo(blur+radius, blur);
-    ctxt.lineTo(blur+size.x-radius, blur);
-    ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
-    /* right */
-    ctxt.lineTo(blur+size.x, blur+size.y-radius);
-    ctxt.arc(blur+size.x-radius, blur+size.y-radius, radius, 0, HalfPI, false);
-    /* bottom */
-    ctxt.lineTo(blur+radius, blur+size.y);
-    ctxt.arc(blur+radius, blur+size.y-radius, radius, HalfPI, -Math.PI, false);
-    /* left */
-    ctxt.lineTo(blur, blur+radius);
-    ctxt.arc(blur+radius, blur+radius, radius, -Math.PI, -HalfPI, false);
+    this.path();
     ctxt.fill();
 
     ctxt.restore();
-    ctxt.moveTo(blur+radius, blur);
-    ctxt.beginPath();
-    /* top */
-    ctxt.lineTo(blur+radius, blur);
-    ctxt.lineTo(blur+size.x-radius, blur);
-    ctxt.arc(blur+size.x-radius, blur+radius, radius, -HalfPI, 0, false);
-    /* right */
-    ctxt.lineTo(blur+size.x, blur+size.y-radius);
-    ctxt.arc(blur+size.x-radius, blur+size.y-radius, radius, 0, HalfPI, false);
-    /* bottom */
-    ctxt.lineTo(blur+radius, blur+size.y);
-    ctxt.arc(blur+radius, blur+size.y-radius, radius, HalfPI, -Math.PI, false);
-    /* left */
-    ctxt.lineTo(blur, blur+radius);
-    ctxt.arc(blur+radius, blur+radius, radius, -Math.PI, -HalfPI, false);
+    this.path();
     ctxt.stroke();
   },
 
