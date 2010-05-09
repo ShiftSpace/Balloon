@@ -13,13 +13,54 @@ SSFx.Morph = Class.refactor(Fx.Morph, {
   }
 });
 
+var Vector = new Class({
+  initialize: function(x, y) {
+    this.x = x;
+    this.y = y;
+  },
+
+  add: function(v) {
+    return new Vector(this.x+v.x, this.y+v.y);
+  },
+
+  sub: function(v) {
+    return new Vector(this.x-v.x, this.y-v.y);
+  },
+
+  div: function(s) {
+    return new Vector(this.x/s, this.y/s);
+  },
+
+  mul: function(s) {
+    return new Vector(this.x*s, this.y*s);
+  },
+
+  xcomp: function() {
+    return new Vector(this.x, 0);
+  },
+
+  ycomp: function() {
+    return new Vector(0, this.y);
+  },
+
+  invert: function() {
+    return new Vector(-this.y, this.x);
+  }
+});
+
+Vector.toVector = function(size) {
+  if(size.width) return new Vector(size.width, size.height);
+  if(size.x) return new Vector(size.x, size.y);
+  return null;
+};
+
 window.Balloon = new Class({
   Implements: [Events, Options],
   
   defaults: {
     autoPosition: false,
     position: null,
-    offset: {x: 0.0, y: 0.0},
+    offset: new Vector(0.0, 0.0),
     animate: true,
     pointer: null,            /* "top", "left", "right", "bottom" */
     anchorTo: "top",          /* "top", "left", "right", "bottom" */
@@ -100,7 +141,6 @@ window.Balloon = new Class({
   },
 
   initAnchorBehavior: function() {
-    console.log("initAnchorBehavior");
     if(!this.pointer) {
       this.pointer = this.invert[this.options.anchorTo];
     }
@@ -111,42 +151,36 @@ window.Balloon = new Class({
     styles[this.pointer] = this.options.offset[this.tos[this.pointer]];
     this.wrapper.setStyles(styles);
     if(this.options.openOnAnchorClick) {
-      console.log("add");
       this.options.anchor.addEvent("click", function(evt) {
         evt = new Event(evt);
-        console.log("click");
         this.show();
       }.bind(this));
     }
   },
 
   show: function() {
-    console.log("show");
-    var asize = this.options.anchor.getSize(),
-        apos = this.options.anchor.getPosition(),
-        pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0));
-    var styles = {
-      width: 50,
-      height: 50
-    };
-    var to = this.tos[this.options.anchorTo];
-    styles[this.invert[this.options.anchorTo]] = apos[to] - this.options.offset[to];
-    to = this.tos[this.compl[this.options.anchorTo]];
-    styles[this.compl[this.options.anchorTo]] = (apos[to]+(asize[to]/2.0)-10) - this.options.offset[to];
-    console.log(styles);
+    var asize = Vector.toVector(this.options.anchor.getSize()),
+        apos = Vector.toVector(this.options.anchor.getPosition()),
+        size = new Vector(50, 50),
+        pad = Math.max(blur, (this.pointer ? pointerSize+blur : 0)),
+        rsize = size.add(new Vector(pad*2.0, pad*2.0));
+        to = this.tos[this.options.anchorTo],
+        av = apos.add(asize.div(2.0)),
+        bv = (asize[to+"comp"]()).add(size[to+"comp"]()).add(size.div(2.0)),
+        loc = av.sub(bv);
     this.element.setStyles({
-      width: styles.width,
-      height: styles.height
+      width: size.x,
+      height: size.y
     });
+    this.wrapper.setStyle("display", "block");
+    var esize = this.element.getSize();
     this.wrapper.setStyles({
       position: "absolute",
       display: "block",
-      top: styles.top || "",
-      right: styles.right || "",
-      bottom: styles.bottom || "",
-      left: styles.left || "",
-      width: styles.width+(2.0*pad),
-      height: styles.height+(2.0*pad)
+      left: loc.x,
+      top: loc.y,
+      width: esize.x+(2.0*pad),
+      height: esize.y+(2.0*pad)
     });
     this.refresh();
     /*
